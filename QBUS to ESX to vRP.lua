@@ -18,7 +18,9 @@
 --   end
 -- end)
 
--- La vRP nu puneti nimic
+-- local Tunnel = module("vrp", "lib/Tunnel")
+-- local Proxy = module("vrp", "lib/Proxy")
+-- vRP = Proxy.getInterface("vRP")
 -- -----------------------------------------------------------
 -- RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
 -- AddEventHandler('QBCore:Client:OnPlayerLoaded', 
@@ -35,7 +37,7 @@
 -- RegisterNetEvent('esx:setJob')
 -- AddEventHandler('esx:setJob',
 
--- La vRP nu exista asa ceva
+-- La vRP nu exista asa ceva (decat se sterge)
 -- --------------------------------------------------------------------------------
 -- QBCore.UI.Menu.Open
 -- QBCore.UI.Menu.CloseAll() -- (menu default scripti kurmanız gerekmektedir.)
@@ -109,13 +111,47 @@
 
 -- ESX.RegisterServerCallback()
 
--- Orice.RegisterServerCallback()  "Orice" depinde de ce puneti voi
+RegisterServerEvent(GetCurrentResourceName()..':triggerServerCallback')
+AddEventHandler(GetCurrentResourceName()..':triggerServerCallback', function(name, requestId, ...)
+local playerId = source
+
+TriggerServerCallback(name, requestId, playerId, function(...)
+TriggerClientEvent(GetCurrentResourceName()..':serverCallback', playerId, requestId, ...)
+end, ...)
+end)
+
+function RegisterServerCallback(name, cb)
+ServerCallbacks[name]=cb
+end
+
+function TriggerServerCallback(name, requestId, source, cb, ...)
+if ServerCallbacks[name] then
+ServerCallbacks[name](source, cb, ...)
+end
+end
 -- -----------------------------------------------------------------------------------------------------------
 -- QBCore.Functions.TriggerCallback()
 
 -- ESX.TriggerServerCallback()
 
--- Orice.TriggerServerCallback()  "Orice" depinde de ce puneti voi
+RegisterServerEvent(GetCurrentResourceName()..':triggerServerCallback')
+AddEventHandler(GetCurrentResourceName()..':triggerServerCallback', function(name, requestId, ...)
+local playerId = source
+
+TriggerServerCallback(name, requestId, playerId, function(...)
+TriggerClientEvent(GetCurrentResourceName()..':serverCallback', playerId, requestId, ...)
+end, ...)
+end)
+
+function RegisterServerCallback(name, cb) -- Vine doar RegisterServerCallback
+ServerCallbacks[name]=cb
+end
+
+function TriggerServerCallback(name, requestId, source, cb, ...) -- si TriggerServerCallback fara esx
+if ServerCallbacks[name] then
+ServerCallbacks[name](source, cb, ...)
+end
+end
 -- -----------------------------------------------------------------------------------------------------------
 -- -- qb'de cid esx'de identifier kullanılıyor olayı çözmeniz için ufak bir kod bloğu bıraktık.
 -- QBCore.Functions.CreateCallback('skillsystem:fetchStatus', function(source, cb)
@@ -164,7 +200,7 @@
 --     end)
 -- end)
 
--- Orice.RegisterServerCallback("get:Level", function(source, cb)
+-- RegisterServerCallback("get:Level", function(source, cb)
 --     local src = source
 --     local user = vRP.getUserId(src)
 
@@ -197,9 +233,13 @@
 -- ESX.ExecuteSql() --(ghmattimysql)
 -- MySQL.Async.execute()
 
--- Depinde de driver (ghmattimysql/MySQL-Async/oxmysql)
+-- exports.ghmattimysql:execute("")
+-- exports.oxmysql:execute("")
+
+-- MySQL.CreateCommand("", "")
+-- MySQL.query("")
 -- ----------------------------------------------------------------------------------------------------------------------
 -- QBCore.Commands.Add()
 
--- RegisterCommand  (si pentru ESX si pentru vRP)
+-- RegisterCommand("", function()
 -- ----------------------------------------------------------------------------------------------------------------------
